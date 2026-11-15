@@ -66,7 +66,8 @@ export class AuthController {
     const token = authHeader.split(' ')[1];
     try {
       const payload = await this.jwtService.verifyAsync(token);
-      return { valido: true, payload };
+      const usuario = await this.authService.getPerfil(payload.sub);
+      return { valido: true, payload, usuario };
     } catch {
       throw new UnauthorizedException('Token inválido o expirado.');
     }

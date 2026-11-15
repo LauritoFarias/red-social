@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { FileService } from './file/file.service';
 import { AuthModule } from './auth/auth.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AuthModule } from './auth/auth.module';
     MongooseModule.forRoot(process.env.CONNECTION_STRING!),
     UsuariosModule,
     AuthModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService, FileService],
