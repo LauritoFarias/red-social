@@ -125,7 +125,7 @@ export class AuthService {
       throw new NotFoundException('Usuario no encontrado.');
     }
 
-    // Si cambia el username, verificamos que no pertenezca a otro usuario
+    
     if (datos.username && datos.username.trim() !== user.username) {
       const usernameLimpio = datos.username.trim();
       const existeUsername = await this.usuarioModel.findOne({

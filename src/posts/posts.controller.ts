@@ -27,7 +27,7 @@ export class PostsController {
     private readonly fileService: FileService,
   ) {}
 
-  // Helper seguro que detecta sub, _id o id tanto en req.user como en req.usuario
+  
   private getUserId(req: any): string {
     const u = req.user || req.usuario;
     const id = u?.sub || u?._id || u?.id;
@@ -49,10 +49,10 @@ export class PostsController {
     @Req() req: any,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    // 1. Primero obtenemos el userId (si hay algún problema, falla antes de subir a Cloudinary)
+    
     const userId = this.getUserId(req);
 
-    // 2. Si adjuntó imagen, la subimos
+    
     let imagenUrl: string | undefined;
     if (file) {
       imagenUrl = await this.fileService.cloudinaryUploader(file);

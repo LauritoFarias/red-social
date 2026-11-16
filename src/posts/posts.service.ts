@@ -1,4 +1,4 @@
-// src/posts/posts.service.ts
+
 import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -99,7 +99,7 @@ export class PostsService {
     return { deleted: true, postId };
   }
 
-  // ================= COMENTARIOS =================
+  
 
   async getComments(postId: string, page = 1, limit = 10) {
     const skip = (page - 1) * limit;
@@ -108,7 +108,7 @@ export class PostsService {
     const [data, total] = await Promise.all([
       this.commentModel
         .find(filter)
-        .sort({ createdAt: -1 }) // Más recientes arriba (o 1 si preferís orden cronológico)
+        .sort({ createdAt: -1 }) 
         .skip(skip)
         .limit(limit)
         .populate('autor', 'username nombre apellido imagenUrl fotoPerfil')
@@ -168,7 +168,7 @@ export class PostsService {
 
     const objectId = new Types.ObjectId(cleanId);
 
-    // Buscamos coincidencia tanto por ObjectId como por String plano y sin exigir que 'activo' exista
+    
     const post = await this.postModel
       .findOne({
         $or: [{ _id: objectId }, { _id: cleanId as any }],
