@@ -107,4 +107,55 @@ export class AuthService {
     }
     return this.generateToken(user);
   }
+
+  async actualizarPerfil(
+    userId: string,
+    datos: {
+      nombre?: string;
+      apellido?: string;
+      username?: string;
+      descripcion?: string;
+      fechaNacimiento?: string;
+      password?: string;
+    },
+    file?: Express.Multer.File,
+  ) {
+    const user = await this.usuarioModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado.');
+    }
+
+    // Si cambia el username, verificamos que no pertenezca a otro usuario
+    if (datos.username && datos.username.trim() !== user.username) {
+      const usernameLimpio = datos.username.trim();
+      const existeUsername = await this.usuarioModel.findOne({
+        username: usernameLimpio,
+        _id: { $ne: user._id },
+      });
+      if (existeUsername) {
+        throw new ConflictException('Ese nombre de usuario ya está en uso.');
+      }
+      user.username = usernameLimpio;
+    }
+
+    if (datos.nombre !== undefined) user.nombre = datos.nombre.trim();
+    if (datos.apellido !== undefined) user.apellido = datos.apellido.trim();
+    if (datos.descripcion !== undefined) user.descripcion = datos.descripcion.trim();
+    if (datos.fechaNacimiento !== undefined) {
+      (user as any).fechaNacimiento = datos.fechaNacimiento;
+    }
+
+    if (datos.password) {
+      user.password = await bcrypt.hash(datos.password, 10);
+    }
+
+    if (file) {
+      user.imagenUrl = await this.fileService.cloudinaryUploader(file);
+    }
+
+    await user.save();
+
+    const { password, ...usuarioActualizado } = user.toObject();
+    return { usuario: usuarioActualizado };
+  }
 }

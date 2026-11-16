@@ -10,6 +10,7 @@ import {
   UnauthorizedException,
   HttpCode,
   HttpStatus,
+  Patch
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -91,5 +92,40 @@ export class AuthController {
     } catch {
       throw new UnauthorizedException('El token ya expiró o es inválido.');
     }
+  }
+
+  @Patch('perfil')
+  @UseInterceptors(
+    FileInterceptor('imagen', {
+      storage: memoryStorage(),
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter: (_req, file, cb) => {
+        if (!file.mimetype.match(/^image\/(png|jpeg|webp|gif)$/)) {
+          return cb(
+            new BadRequestException('Formato de imagen no válido (solo PNG, JPG, WEBP o GIF).'),
+            false,
+          );
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  async actualizarPerfil(
+    @Headers('authorization') authHeader: string,
+    @Body() body: any,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    if (!authHeader?.startsWith('Bearer ')) {
+      throw new UnauthorizedException('Token no proporcionado.');
+    }
+    const token = authHeader.split(' ')[1];
+    let payload: any;
+    try {
+      payload = await this.jwtService.verifyAsync(token);
+    } catch {
+      throw new UnauthorizedException('Token inválido o expirado.');
+    }
+
+    return this.authService.actualizarPerfil(payload.sub, body, file);
   }
 }

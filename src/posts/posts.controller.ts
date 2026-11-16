@@ -66,8 +66,9 @@ export class PostsController {
     @Query('sortBy') sortBy: 'fecha' | 'likes' = 'fecha',
     @Query('page') page = '1',
     @Query('limit') limit = '10',
+    @Query('userId') userId?: string,
   ) {
-    return this.postsService.findAll(sortBy, Number(page), Number(limit));
+    return this.postsService.findAll(sortBy, Number(page), Number(limit), userId);
   }
 
   @Get(':id')

@@ -23,7 +23,12 @@ export class PostsService {
     return guardado.populate('autor', 'username nombre apellido imagenUrl fotoPerfil');
   }
 
-  async findAll(sortBy: 'fecha' | 'likes' = 'fecha', page = 1, limit = 10) {
+  async findAll(
+    sortBy: 'fecha' | 'likes' = 'fecha',
+    page = 1,
+    limit = 10,
+    userId?: string,
+  ) {
     const skip = (page - 1) * limit;
 
     const sortQuery: Record<string, 1 | -1> =
@@ -31,7 +36,15 @@ export class PostsService {
         ? { likesCount: -1, createdAt: -1 }
         : { createdAt: -1 };
 
-    const filter = { activo: true };
+    const filter: Record<string, any> = { activo: true };
+
+    if (userId && Types.ObjectId.isValid(userId.trim())) {
+      const cleanUserId = userId.trim();
+      filter.$or = [
+        { autor: new Types.ObjectId(cleanUserId) },
+        { autor: cleanUserId },
+      ];
+    }
 
     const [data, total] = await Promise.all([
       this.postModel
