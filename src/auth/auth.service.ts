@@ -96,7 +96,15 @@ export class AuthService {
       httpOnly: true,
       sameSite: 'strict',
       secure: false,
-      maxAge: 1000 * 60 * 15, // 15 minutos (o el tiempo que definas para tu sesión)
+      maxAge: 1000 * 60 * 15,
     });
+  }
+  
+  async refreshToken(userId: string) {
+    const user = await this.usuarioModel.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('Usuario no encontrado.');
+    }
+    return this.generateToken(user);
   }
 }

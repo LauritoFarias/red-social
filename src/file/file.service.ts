@@ -8,14 +8,12 @@ export class FileService {
   constructor(private readonly configService: ConfigService) {}
 
   cloudinaryUploader(file: Express.Multer.File): Promise<string> {
-    // Eliminamos CLOUDINARY_URL por si existe en el entorno y está pisando la configuración
     delete process.env.CLOUDINARY_URL;
 
     const cloudName = this.configService.get<string>('CLOUDINARY_CLOUD_NAME')?.trim();
     const apiKey = this.configService.get<string>('CLOUDINARY_API_KEY')?.trim();
     const apiSecret = this.configService.get<string>('CLOUDINARY_API_SECRET')?.trim();
 
-    // Este log se ejecuta al hacer clic en Registrarme: revisá qué muestra en la terminal
     console.log('Verificando credenciales Cloudinary al subir:', {
       cloudName,
       apiKey: apiKey ? `${apiKey.slice(0, 4)}...` : 'UNDEFINED',

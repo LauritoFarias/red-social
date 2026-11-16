@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { Usuario } from '../../usuarios/entities/usuario.entity';
 
 @Schema({ timestamps: true })
 export class Post extends Document {
@@ -12,10 +13,10 @@ export class Post extends Document {
   @Prop()
   imagenUrl?: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  @Prop({ type: Types.ObjectId, ref: Usuario.name, required: true })
   autor: Types.ObjectId;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: Usuario.name }], default: [] })
   likes: Types.ObjectId[];
 
   @Prop({ default: 0, index: true })
@@ -23,6 +24,9 @@ export class Post extends Document {
 
   @Prop({ default: true })
   activo: boolean;
+
+  @Prop({ default: 0 })
+  commentsCount: number;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

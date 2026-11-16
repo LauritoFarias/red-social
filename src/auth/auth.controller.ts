@@ -72,4 +72,24 @@ export class AuthController {
       throw new UnauthorizedException('Token inválido o expirado.');
     }
   }
+
+  @Get('autorizar')
+  async autorizar(@Headers('authorization') authHeader: string) {
+    return this.verificarToken(authHeader);
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(@Headers('authorization') authHeader: string) {
+    if (!authHeader?.startsWith('Bearer ')) {
+      throw new UnauthorizedException('Token no proporcionado.');
+    }
+    const token = authHeader.split(' ')[1];
+    try {
+      const payload = await this.jwtService.verifyAsync(token);
+      return this.authService.refreshToken(payload.sub);
+    } catch {
+      throw new UnauthorizedException('El token ya expiró o es inválido.');
+    }
+  }
 }
